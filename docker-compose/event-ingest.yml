@@ -1,0 +1,10 @@
+services:
+  event-ingest:
+    build:
+      context: ../services/event-ingest
+      dockerfile: Dockerfile
+    container_name: shop-event-ingest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../shared:/shared

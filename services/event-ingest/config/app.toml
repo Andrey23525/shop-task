@@ -1,0 +1,21 @@
+[server]
+host = "0.0.0.0"
+port = 8080
+read_timeout = 30
+write_timeout = 30
+idle_timeout = 120
+
+[events]
+max_payload_size = 1048576
+validation_timeout = 5
+max_batch_size = 1000
+generation_interval = 10  # секунд между генерациями
+events_per_batch = 500    # максимальное количество событий за раз
+
+[logging]
+level = "INFO"
+format = "json"
+
+[pipeline]
+url = "http://pipeline-apid:8082/api/v1/pipeline"
+shards_count = 2

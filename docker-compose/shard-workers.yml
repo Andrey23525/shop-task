@@ -1,0 +1,30 @@
+services:
+  shard-worker-0:
+    build:
+      context: ../services/shard-worker
+      dockerfile: Dockerfile
+    container_name: shop-shard-worker-0
+    environment:
+      - SHARD_ID=0
+      - MYSQL_URL=mysql://shop_user:shop_password@mysql-shard-0:3306/shop_shard_0
+      - BALANCE_DAEMON_URL=http://balance-daemon:8081
+    volumes:
+      - ../shared:/shared
+    depends_on:
+      - mysql-shard-0
+      - balance-daemon
+
+  shard-worker-1:
+    build:
+      context: ../services/shard-worker
+      dockerfile: Dockerfile
+    container_name: shop-shard-worker-1
+    environment:
+      - SHARD_ID=1
+      - MYSQL_URL=mysql://shop_user:shop_password@mysql-shard-1:3306/shop_shard_1
+      - BALANCE_DAEMON_URL=http://balance-daemon:8081
+    volumes:
+      - ../shared:/shared
+    depends_on:
+      - mysql-shard-1
+      - balance-daemon

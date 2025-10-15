@@ -1,0 +1,8 @@
+services:
+  shard-splitter:
+    build:
+      context: ../services/shard-splitter
+      dockerfile: Dockerfile
+    container_name: shop-shard-splitter
+    volumes:
+      - ../shared:/shared
