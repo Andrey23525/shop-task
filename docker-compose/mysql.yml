@@ -43,6 +43,8 @@ services:
       - ../db/pipeline_ddl.sql:/docker-entrypoint-initdb.d/01-pipeline-ddl.sql
       - mysql_pipeline_data:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - network1
 volumes:
   mysql_shard_0_data:
   mysql_shard_1_data:

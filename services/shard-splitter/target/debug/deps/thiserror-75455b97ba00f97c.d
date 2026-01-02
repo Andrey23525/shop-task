@@ -1,0 +1,14 @@
+C:\Users\user\Documents\GitHub\shop-task\services\shard-splitter\target\debug\deps\thiserror-75455b97ba00f97c.d: C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\lib.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\aserror.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\display.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\var.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\private.rs C:\Users\user\Documents\GitHub\shop-task\services\shard-splitter\target\debug\build\thiserror-1c387a0575e765ba\out/private.rs
+
+C:\Users\user\Documents\GitHub\shop-task\services\shard-splitter\target\debug\deps\libthiserror-75455b97ba00f97c.rlib: C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\lib.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\aserror.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\display.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\var.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\private.rs C:\Users\user\Documents\GitHub\shop-task\services\shard-splitter\target\debug\build\thiserror-1c387a0575e765ba\out/private.rs
+
+C:\Users\user\Documents\GitHub\shop-task\services\shard-splitter\target\debug\deps\libthiserror-75455b97ba00f97c.rmeta: C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\lib.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\aserror.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\display.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\var.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\private.rs C:\Users\user\Documents\GitHub\shop-task\services\shard-splitter\target\debug\build\thiserror-1c387a0575e765ba\out/private.rs
+
+C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\lib.rs:
+C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\aserror.rs:
+C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\display.rs:
+C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\var.rs:
+C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\thiserror-2.0.17\src\private.rs:
+C:\Users\user\Documents\GitHub\shop-task\services\shard-splitter\target\debug\build\thiserror-1c387a0575e765ba\out/private.rs:
+
+# env-dep:OUT_DIR=C:\\Users\\user\\Documents\\GitHub\\shop-task\\services\\shard-splitter\\target\\debug\\build\\thiserror-1c387a0575e765ba\\out

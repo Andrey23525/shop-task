@@ -1,0 +1,1 @@
+fn(axum::Json<EventData>) -> impl Future<Output = impl IntoResponse> {event_ingest_done}: Handler<_, _>

@@ -1,0 +1,12 @@
+C:\Users\user\Documents\GitHub\shop-task\services\shard-splitter\target\debug\deps\sqlx-c5fc22a95f14492c.d: C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\lib.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\any\mod.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\macros\mod.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\ty_match.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\spec_error.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\lib.md C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\macros/test.md C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\any\install_drivers_note.md
+
+C:\Users\user\Documents\GitHub\shop-task\services\shard-splitter\target\debug\deps\libsqlx-c5fc22a95f14492c.rmeta: C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\lib.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\any\mod.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\macros\mod.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\ty_match.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\spec_error.rs C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\lib.md C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\macros/test.md C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\any\install_drivers_note.md
+
+C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\lib.rs:
+C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\any\mod.rs:
+C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\macros\mod.rs:
+C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\ty_match.rs:
+C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\spec_error.rs:
+C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\lib.md:
+C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\macros/test.md:
+C:\Users\user\.cargo\registry\src\index.crates.io-1949cf8c6b5b557f\sqlx-0.8.6\src\any\install_drivers_note.md:

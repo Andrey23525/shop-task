@@ -1,5 +1,3 @@
-version: '3.8'
-
 # Включаем все сервисы из отдельных файлов
 include:
   - docker-compose/mysql.yml
@@ -7,5 +5,5 @@ include:
   - docker-compose/shard-splitter.yml
   - docker-compose/shard-workers.yml
   - docker-compose/balance-daemon.yml
-  - docker-compose/cache-service.yml
-  - docker-compose/tests.yml
+#  - docker-compose/cache-service.yml
+#  - docker-compose/tests.yml

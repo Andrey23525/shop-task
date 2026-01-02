@@ -6,3 +6,16 @@ services:
     container_name: shop-shard-splitter
     volumes:
       - ../shared:/shared
+
+    ports:
+      - "8082:8082"
+
+    networks:
+      - network1
+
+    depends_on:
+      - mysql-pipeline
+
+networks:
+  network1:
+    driver: bridge

@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
 	"math/rand"
@@ -16,23 +17,87 @@ import (
 	"shop-event-ingest/internal/services"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 type App struct {
-	config     *config.Config
-	server     *http.Server
-	services   *services.Services
+	config   *config.Config
+	server   *http.Server
+	services *services.Services
+	db       *sql.DB
+}
+
+// Структуры для pipeline endpoints
+type IngestRequest struct {
+	Filename string  `json:"filename" binding:"required"`
+	Shards   []int32 `json:"shards" binding:"required"`
+}
+
+type IngestResponse struct {
+	Filename string  `json:"filename"`
+	Shards   []int32 `json:"shards"`
+	Created  bool    `json:"created"`
+}
+
+type IngestDoneRequest struct {
+	Filename string `json:"filename" binding:"required"`
+}
+
+type IngestDoneResponse struct {
+	Filename    string `json:"filename"`
+	UpdatedRows int64  `json:"updated_rows"`
 }
 
 func New(cfg *config.Config) *App {
 	// Инициализируем сервисы
 	svc := services.New(cfg)
 
+	// Подключаемся к БД для pipeline tracking
+	databaseURL := os.Getenv("DATABASE_URL")
+	if databaseURL == "" {
+		databaseURL = "shop_user:shop_password@tcp(mysql-pipeline:3306)/pipeline_db?parseTime=true"
+	}
+
+	db, err := sql.Open("mysql", databaseURL)
+	if err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+	}
+
+	// Проверяем подключение
+	if err := db.Ping(); err != nil {
+		log.Fatalf("Failed to ping database: %v", err)
+	}
+
+	// Настраиваем пул соединений
+	db.SetMaxOpenConns(5)
+	db.SetMaxIdleConns(5)
+
+	// Создаем таблицу если её нет
+	createTableSQL := `
+		CREATE TABLE IF NOT EXISTS pipeline_tracking (
+			id INT AUTO_INCREMENT PRIMARY KEY,
+			filename VARCHAR(255) NOT NULL,
+			shard INT NOT NULL,
+			event_ingest_status ENUM('new', 'started', 'done', 'failed') DEFAULT 'new',
+			transform_status ENUM('new', 'started', 'done', 'failed') DEFAULT 'new',
+			load_status ENUM('new', 'started', 'done', 'failed') DEFAULT 'new',
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			UNIQUE KEY unique_filename_shard (filename, shard)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+	`
+
+	if _, err := db.Exec(createTableSQL); err != nil {
+		log.Fatalf("Failed to create table: %v", err)
+	}
+
+	log.Println("Database connection established and table created")
+
 	// Инициализируем обработчики
-	handlers := handlers.New(svc)
+	hdl := handlers.New(svc)
 
 	// Настраиваем роутер
-	router := setupRouter(handlers)
+	router := setupRouter(hdl, db)
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port),
@@ -46,6 +111,7 @@ func New(cfg *config.Config) *App {
 		config:   cfg,
 		server:   server,
 		services: svc,
+		db:       db,
 	}
 
 	// Запускаем автоматическую генерацию событий при старте
@@ -74,6 +140,11 @@ func (a *App) Run() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
+	// Закрываем БД
+	if a.db != nil {
+		a.db.Close()
+	}
+
 	if err := a.server.Shutdown(ctx); err != nil {
 		return fmt.Errorf("server forced to shutdown: %w", err)
 	}
@@ -96,22 +167,22 @@ func (a *App) startEventGeneration() {
 
 	// Ждем до следующей границы интервала
 	now := time.Now()
-	nextBoundary := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), 
+	nextBoundary := time.Date(now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(),
 		((now.Second()/int(interval.Seconds()))+1)*int(interval.Seconds()), 0, now.Location())
 	if nextBoundary.After(now.Add(interval)) {
 		nextBoundary = nextBoundary.Add(-interval)
 	}
-	
+
 	waitTime := nextBoundary.Sub(now)
 	log.Printf("Waiting %v until next %v boundary...", waitTime, interval)
 	time.Sleep(waitTime)
-	
+
 	log.Printf("Starting automatic event generation (interval: %v, max events: %d)...", interval, cfgMax)
-	
+
 	// Запускаем генерацию событий по интервалу из конфигурации
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
-	
+
 	for {
 		select {
 		case <-ticker.C:
@@ -127,7 +198,7 @@ func (a *App) startEventGeneration() {
 	}
 }
 
-func setupRouter(handlers *handlers.Handlers) *gin.Engine {
+func setupRouter(handlers *handlers.Handlers, db *sql.DB) *gin.Engine {
 	// Настраиваем Gin
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
@@ -142,12 +213,113 @@ func setupRouter(handlers *handlers.Handlers) *gin.Engine {
 	router.GET("/ready", handlers.Ready)
 
 	// API endpoints
-	api := router.Group("/api/v1")
+	api := router.Group("/api")
 	{
 		api.GET("/events/stats", handlers.GetEventStats)
 	}
 
+	// Pipeline endpoints
+	pipeline := router.Group("/pipeline")
+	{
+		pipeline.POST("/files/register", filesRegisterHandler(db))
+		pipeline.POST("/stages/event-ingest/done", stagesEventIngestDoneHandler(db))
+	}
+
 	return router
+}
+
+// filesRegisterHandler - обработчик регистрации файлов
+func filesRegisterHandler(db *sql.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req IngestRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		log.Printf("Register request: %+v", req)
+
+		anyCreated := false
+
+		for _, shard := range req.Shards {
+			query := `
+				INSERT INTO pipeline_tracking (
+					filename,
+					shard,
+					event_ingest_status,
+					transform_status,
+					load_status
+				)
+				VALUES (?, ?, 'started', 'new', 'new')
+				ON DUPLICATE KEY UPDATE filename = filename
+			`
+
+			result, err := db.Exec(query, req.Filename, shard)
+			if err != nil {
+				log.Printf("Database error: %v", err)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "database error"})
+				return
+			}
+
+			// RowsAffected() вернёт 1 если запись вставлена, 2 если была обновлена
+			rowsAffected, err := result.RowsAffected()
+			if err != nil {
+				log.Printf("Error getting rows affected: %v", err)
+				continue
+			}
+
+			if rowsAffected == 1 {
+				anyCreated = true
+			}
+		}
+
+		response := IngestResponse{
+			Filename: req.Filename,
+			Shards:   req.Shards,
+			Created:  anyCreated,
+		}
+
+		c.JSON(http.StatusOK, response)
+	}
+}
+
+// stagesEventIngestDoneHandler - обработчик завершения ingest
+func stagesEventIngestDoneHandler(db *sql.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req IngestDoneRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		log.Printf("Ingest done request: %+v", req)
+
+		query := `
+			UPDATE pipeline_tracking
+			SET event_ingest_status = 'done', updated_at = NOW()
+			WHERE filename = ?
+		`
+
+		result, err := db.Exec(query, req.Filename)
+		if err != nil {
+			log.Printf("Database error: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "database error"})
+			return
+		}
+
+		rowsAffected, err := result.RowsAffected()
+		if err != nil {
+			log.Printf("Error getting rows affected: %v", err)
+			rowsAffected = 0
+		}
+
+		response := IngestDoneResponse{
+			Filename:    req.Filename,
+			UpdatedRows: rowsAffected,
+		}
+
+		c.JSON(http.StatusOK, response)
+	}
 }
 
 func corsMiddleware() gin.HandlerFunc {

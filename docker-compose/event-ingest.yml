@@ -8,3 +8,8 @@ services:
       - "8080:8080"
     volumes:
       - ../shared:/shared
+    networks:
+      - network1
+
+    depends_on:
+      - mysql-pipeline
