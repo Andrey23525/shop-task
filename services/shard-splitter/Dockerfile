@@ -1,42 +1,25 @@
-FROM rust:alpine as builder
+# Используем официальный Python образ с нужной версией
+FROM python:3.11-slim
+
+# Устанавливаем системные зависимости (если нужны)
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Создаем рабочую директорию
 WORKDIR /app
-RUN apk add --no-cache musl-dev
 
-# Кэшируем зависимости
-COPY Cargo.toml Cargo.lock ./
-RUN --mount=type=cache,target=/usr/local/cargo/registry \
-    mkdir src && \
-    echo "fn main() {}" > src/main.rs && \
-    cargo build --release && \
-    rm -rf src
+# Копируем зависимости
+COPY requirements.txt .
 
-# Собираем реальный код
-COPY src ./src
-RUN --mount=type=cache,target=/usr/local/cargo/registry \
-    --mount=type=cache,target=/app/target \
-    cargo build --release && \
-    cp /app/target/release/shard-splitter /usr/local/bin/
+# Устанавливаем Python-зависимости
+RUN pip install --no-cache-dir -r requirements.txt
 
-FROM alpine:latest
-WORKDIR /app
-RUN apk add --no-cache libgcc
-RUN apk --no-cache add ca-certificates bash
-COPY --from=builder /usr/local/bin/shard-splitter ./main
-# Копируем бинарный файл из builder stage (исправлен путь и имя)
-#COPY --from=builder /app/target/release/shard-splitter ./main
+# Копируем исходный код
+COPY . .
 
-# Создаём скрипт запуска
-RUN printf '#!/usr/bin/env bash\n' > /app/run.sh && \
-    printf 'set -e\n' >> /app/run.sh && \
-    printf 'SERVICE_DIR="/shared/pipeline-api"\n' >> /app/run.sh && \
-    printf 'mkdir -p "$SERVICE_DIR"\n' >> /app/run.sh && \
-    printf 'cleanup(){ echo "Cleaning $SERVICE_DIR ..."; rm -rf "$SERVICE_DIR"/* || true; }\n' >> /app/run.sh && \
-    printf 'trap cleanup EXIT TERM INT\n' >> /app/run.sh && \
-    printf 'echo "Pipeline API Service"\n' >> /app/run.sh && \
-    printf 'echo "Starting..."\n' >> /app/run.sh && \
-    printf './main | tee -a "$SERVICE_DIR/activity.log"\n' >> /app/run.sh && \
-    chmod +x /app/run.sh
+# Опционально: запускаем тесты
+# RUN pytest tests/ -v
 
-EXPOSE 8082
-
-CMD ["/app/run.sh"]
+# Указываем команду запуска
+CMD ["python", "main.py"]

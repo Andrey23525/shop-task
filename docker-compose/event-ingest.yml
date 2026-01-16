@@ -9,7 +9,4 @@ services:
     volumes:
       - ../shared:/shared
     networks:
-      - network1
-
-    depends_on:
-      - mysql-pipeline
+      - network

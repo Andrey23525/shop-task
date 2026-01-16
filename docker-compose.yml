@@ -4,6 +4,9 @@ include:
   - docker-compose/event-ingest.yml
   - docker-compose/shard-splitter.yml
   - docker-compose/shard-workers.yml
-  - docker-compose/balance-daemon.yml
+  - docker-compose/nginx.yml
+  - docker-compose/pipeline-api.yml
+  - docker-compose/mysql-sender.yml
+#  - docker-compose/balance-daemon.yml
 #  - docker-compose/cache-service.yml
 #  - docker-compose/tests.yml

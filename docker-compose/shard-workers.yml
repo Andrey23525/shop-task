@@ -12,7 +12,8 @@ services:
       - ../shared:/shared
     depends_on:
       - mysql-shard-0
-      - balance-daemon
+    networks:
+      - network
 
   shard-worker-1:
     build:
@@ -27,4 +28,5 @@ services:
       - ../shared:/shared
     depends_on:
       - mysql-shard-1
-      - balance-daemon
+    networks:
+      - network
