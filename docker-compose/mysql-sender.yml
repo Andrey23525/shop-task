@@ -1,0 +1,22 @@
+services:
+  mysql-sender:
+    build:
+      context: ../services/mysql-sender
+      dockerfile: Dockerfile
+    container_name: shop-mysql-sender
+    environment:
+      - PIPELINE_API_URL=http://pipeline-apid:8082/api/v1/pipeline
+      - MYSQL_SHARD_0_HOST=mysql-shard-0
+      - MYSQL_SHARD_1_HOST=mysql-shard-1
+      - MYSQL_PORT=3306
+      - MYSQL_USER=shop_user
+      - MYSQL_PASSWORD=shop_password
+      - MYSQL_DATABASE_PREFIX=shop_shard_
+      - POLL_INTERVAL=5
+    volumes:
+      - ../shared:/shared
+    networks:
+      - network
+    depends_on:
+      - pipeline-apid-impl
+    restart: unless-stopped

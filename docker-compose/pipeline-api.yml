@@ -1,0 +1,23 @@
+services:
+  pipeline-apid-impl:
+    build:
+      context: ../services/pipeline-apid
+      dockerfile: Dockerfile
+    container_name: shop-pipeline-apid-impl
+    ports:
+      - "8083:8083"
+    environment:
+      - MYSQL_HOST=mysql-pipeline
+      - MYSQL_PORT=3306
+      - MYSQL_USER=shop_user
+      - MYSQL_PASSWORD=shop_password
+      - MYSQL_DATABASE=pipeline_db
+    volumes:
+      - ../shared:/shared
+    networks:
+      - network
+    restart: unless-stopped
+
+networks:
+  network:
+    driver: bridge
